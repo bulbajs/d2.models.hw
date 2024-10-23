@@ -1,11 +1,13 @@
 from django.db import models
-# from django.contrib.auth import base_user
+from django.contrib.auth.models import User
 
 
 class Author(models.Model):
-    rating = models.FloatField(default=0.0)
-    author = models.CharField(max_length=255)
-    # user = models.OneToOneField("AbstractUser", on_delete=models.CASCADE)
+    authorUser = models.OneToOneField(User, on_delete=models.CASCADE)
+    ratingAuthor = models.IntegerField(default=0)
+
+    def update_rating(self):
+        pass
 
 
 class Category(models.Model):
@@ -13,22 +15,36 @@ class Category(models.Model):
 
 
 class Post(models.Model):
-    time_in = models.DateTimeField(auto_now_add=True)
-    post = models.BooleanField(default=False)
-    title = models.TextField()
+    NEWS = 'NW'
+    ARTICLE = 'AT'
+    CATEGORY_CHOICES = (
+        (NEWS, 'Новость'),
+        (ARTICLE, 'Статья')
+    )
+    postType = models.CharField(max_length=2, choices=CATEGORY_CHOICES, default=ARTICLE)
+    dateCreation = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=128)
     text = models.TextField()
-    post_rating = models.FloatField(default=0.0)
-
+    postRating = models.IntegerField(default=0)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    category = models.ManyToManyField("Category", through="PostCategory")
+
+    # category = models.ManyToManyField("Category", through="PostCategory")
+
+    def like(self):
+        pass
+
+    def dislike(self):
+        pass
 
 
 class Comment(models.Model):
     comment = models.TextField()
-    comment_time_in = models.DateTimeField(auto_now_add=True)
-    comment_rating = models.FloatField(default=0.0)
+    dateCreation = models.DateTimeField(auto_now_add=True)
+    commentRating = models.IntegerField(default=0)
 
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    commentPost = models.ForeignKey(Post, on_delete=models.CASCADE)
+    commentUser = models.ForeignKey(User, on_delete=models.CASCADE)
+
 
 class PostCategory(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
